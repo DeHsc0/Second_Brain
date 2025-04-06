@@ -1,0 +1,55 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = "postgresql://postgres:pass@localhost/postgres"
+  extensions = [vector]
+}
+
+model User {
+  id          String        @id @default(uuid())
+  username    String        @unique
+  clerkId     String        @unique
+  email       String        @unique
+  collections Collections[]
+  contents    Contents[]
+}
+
+model Collections {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  contentType ContentType[]
+  createdAt   DateTime      @default(now())
+  updateAt    DateTime      @updatedAt
+  clerkId     String
+  user        User          @relation(fields: [clerkId], references: [clerkId])
+  contents    Contents[]
+}
+
+model Contents {
+  id           String                @id @default(uuid())
+  title        String
+  description  String?
+  mainContent  String
+  summary      String
+  contentType  ContentType
+  collectionId String
+  createdAt    DateTime              @default(now())
+  updateAt     DateTime              @updatedAt
+  embedding    Unsupported("vector")
+  clerkId      String
+  user         User                  @relation(fields: [clerkId], references: [clerkId])
+  collection   Collections           @relation(fields: [collectionId], references: [id])
+}
+
+enum ContentType {
+  WEBPAGE
+  YOUTUBE
+  CODE
+  INSTAGRAM
+  NOTE
+}
