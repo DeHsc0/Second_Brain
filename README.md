@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Second Brain - Project Readme
 
-## Getting Started
+## Overview
+Second Brain is a knowledge management application that allows users to organize, store, and retrieve information efficiently. Users can create collections and within those collections, add various types of content with automatic summarization capabilities.
 
-First, run the development server:
+## Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Content Management
+- Create collections to organize your knowledge
+- Add content items with:
+  - Title
+  - Description
+  - Content type (WEBPAGE, YOUTUBE, CODE, or NOTE)
+  - Main content
+- Automatic summarization for different content types:
+  - YouTube video summaries
+  - Webpage summaries
+  - Code explanations
+  - Note condensation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Powerful Search
+- Semantic search functionality
+- Find content by describing what you're looking for
+- Search across all your collections and content items
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Content Display
+- View complete content details including:
+  - Title
+  - Description
+  - Content type
+  - Main content
+  - Generated summary
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Technology Stack
 
-## Learn More
+### Backend
+- **Next.js** API routes
+- **Prisma** ORM for database operations
+- **PostgreSQL** with **pgvector** for vector storage and semantic search
+- **Clerk** for authentication and user management
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend
+- **Next.js** (React framework)
+- **TypeScript** for type safety
+- Modern React hooks and components
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### AI Integration
+- **Gemini** for content summarization and semantic search capabilities
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
