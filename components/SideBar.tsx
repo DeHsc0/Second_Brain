@@ -2,7 +2,7 @@
 import { DataContext } from "@/providers/dashboardProvider"
 
 import { useClerk } from "@clerk/nextjs"
-import {ChevronsUpDown , Search , Folder, Star, History, Share , Brain, Github} from "lucide-react"
+import {ChevronsUpDown , Search , Folder, Star, History, Share , Brain, Github, LogOut} from "lucide-react"
 import { Manrope } from 'next/font/google'
 import { useContext } from "react"
 
@@ -10,10 +10,10 @@ const manrope = Manrope({
     subsets : ["latin"]
 })
 
-export default function SideBar( {userId , username , imageUrl } : {userId : string , imageUrl : string , username : string} ){
+export default function SideBar( {userId , username , imageUrl , type } : {userId : string , imageUrl : string , username : string , type : "collection" | "content"} ){
 
-   const sort = useContext(DataContext)
-    const { openUserProfile , redirectToSignIn } = useClerk() 
+    const sort = useContext(DataContext)
+    const { openUserProfile , redirectToSignIn , signOut } = useClerk()
 
     if(!userId || !username || !sort){
         return
@@ -30,7 +30,10 @@ export default function SideBar( {userId , username , imageUrl } : {userId : str
                     </h1>
                 </div> 
                 
-                <ChevronsUpDown onClick={() => { openUserProfile()}}  className="p-2 size-8 bg-[#292929] rounded-lg hover:bg-zinc-700"/>   
+                <div className="flex justify-between items-center gap-4">
+                    <ChevronsUpDown onClick={() => openUserProfile()}  className="p-2 size-8 bg-[#292929] rounded-lg hover:bg-zinc-700"/>
+                    <LogOut onClick={() => signOut() } className="p-2 size-8 bg-[#292929] rounded-lg hover:bg-zinc-700"/>
+                </div>   
             </div>
 
             <div className=" flex justify-between flex-col h-full">
@@ -45,7 +48,7 @@ export default function SideBar( {userId , username , imageUrl } : {userId : str
                         className={`p-3 gap-3 flex  w-full rounded-2xl cursor-pointer ${ sort.sortType === "Default" ? "bg-[#292929] duration-300" : ""}`}>
                             <Folder className={`size-6 ${sort.sortType === "Default" ? "text-emerald-400" : "text-[#737373] duration-300"} `} />
                             <h1 className="text-md">
-                                My Collections
+                                My {type}
                             </h1>
                         </div>
                         <div

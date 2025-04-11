@@ -1,67 +1,67 @@
 "use client"
 import { BellIcon , ChevronDownIcon, Plus, Square, SquareCheckBig, Trash2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
-import { Sort } from "../lib/types/types"
-import { ContentType } from "@prisma/client";
+import { RecCollectionData, Sort } from "../lib/types/types"
 import axios from "axios"
-import CreateCollectionModel from "./CreateCollectionModel";
+import CreationModel from "./CreationModel";
 import { DataContext } from "@/providers/dashboardProvider";
 import { Alert } from "./Alert";
-
-interface RecCollectionData {
-    id : string 
-    title : string 
-    description : string
-    contents : [],
-    contentType : ContentType[]
-}
+import { ContentType } from "@prisma/client";
 
 
-export default function MainDashboard( { username , userId } : { username : string , userId : string } ){
+
+export default function MainDashboard( { username , userId , type , collectionID , searchResuts , search } : { username : string , userId : string  , type : "collection" | "content" , collectionID : string  , searchResuts ?: RecCollectionData[]  , search ?: string }){
 
     const [sort , setSort] = useState<Sort>("Default")
     const [drop , setDrop] = useState(false)
     const [ creationModal , setCreatetionModal] = useState(false)
     const [ recData , setRecData ] = useState<RecCollectionData[]>([])
 
-    const [ selectedCollection , setSelectedCollection] = useState<string[]>([])
+    const [ selectedData , setselectedData] = useState<string[]>([])
 
     const alert = useContext(DataContext)
 
-    const fetchCollections = async () => {
+    const fetchData = async () => {
         try{
-            const response = await axios.get(`http://localhost:3000/api/collections/${userId}`)
-            console.log(response)
+            const response = await axios.get(`${type === "content" ? `http://localhost:3000/api/${collectionID}/content/?userID=${userId}` : `http://localhost:3000/api/collections/${userId}` }`)
             if (response.data.data.length > 0) {
-                console.log(response)
                 setRecData( () => response.data.data ) 
             }
 
             return 
         }
         catch(e){
-            console.log(e)
-            alert?.addAlert("Unable to fetch the Collections")
+            alert?.addAlert(`Unable to fetch the ${type}`)
         }
     }
 
-    const deleteCollections = async (collectionId : string) => {
-            if(selectedCollection.length === 0)return
-            const response = await axios.delete(`http://localhost:3000/api/collections/${userId}` , {data : {id : collectionId , userId}})
-            if(response.status === 200){
-                setRecData(() => recData.filter( data => data.id !== response.data.data.id))
-                setSelectedCollection(() => [])
+    const deleteData = async (collectionIds : string[]) => {
+            if(selectedData.length === 0)return
+            const response = await axios.delete(`${type === "content" ? `http://localhost:3000/api/${collectionID}/content/?userID=${userId}` :   `http://localhost:3000/api/collections/${userId}`}` , {
+                data : {
+                    ids : collectionIds
+                }
+            })
+
+            if(response.status === 200 && selectedData.length === response.data.data.count){
+                setRecData(prev => prev.filter(item => !selectedData.includes(item.id)))
+                setselectedData(() => [])
             } else {
-                return alert?.addAlert("Unable to Delete that Collection")
+                return alert?.addAlert("Unable to Delete Selected Collections")
             }
     }
 
     useEffect( () => {
-        fetchCollections()
+        fetchData()
     } , [])
-    useEffect(() => {
-        console.log(alert)
-    } , [alert])
+
+    useEffect( () => {
+        if(searchResuts && searchResuts.length > 0 ){
+         setRecData(searchResuts)   
+        } else{
+            fetchData()
+        }
+    } , [searchResuts])
 
     if(!username){
         return
@@ -71,10 +71,10 @@ export default function MainDashboard( { username , userId } : { username : stri
         <>
             {alert && alert.alert.length > 0 ? <Alert/> : undefined }
                         
-            {creationModal ? <CreateCollectionModel userId={userId} closeModal={() => setCreatetionModal(false)} addCreatedData={(response) => setRecData( () => [...recData , response.data.data])}/> : undefined}
+            {creationModal ? <CreationModel collectionID={collectionID} type={type} userId={userId} closeModal={() => setCreatetionModal(false)} addCreatedData={(response) => setRecData( () => [...recData , response.data.data[0]])}/> : undefined}
 
             <div className="flex flex-col w-full bg-[#171717] pl-0">
-                <div className="border-b border-[#292929] h-fit w-full px-8 py-6">
+                {type === "collection" ? <div className="border-b border-[#292929] h-fit w-full px-8 py-6">
                     <div className="flex justify-between">
                         <div className="">
                             <h1 className="text-lg font-bold">
@@ -88,8 +88,8 @@ export default function MainDashboard( { username , userId } : { username : stri
                             <BellIcon className="size-11 p-2 bg-[#292929] hover:text-emerald-400 hover:bg-zinc-700 duration-300 rounded-lg"/>
                         </div>
                     </div>
-                </div>
-                <div className="py-7 px-8 flex flex-row justify-between">
+                </div> : undefined}
+                <div className="py-7 px-8 flex flex-row justify-between items-center">
                     <div className="flex gap-2 items-center">
                         <h1 className="text-md">
                             My Collections
@@ -101,10 +101,8 @@ export default function MainDashboard( { username , userId } : { username : stri
                             <Plus/>
                         </button>
                         <button
-                        onClick={() => { selectedCollection.forEach((id) => {
-                            deleteCollections(id)
-                        }) }}
-                        className={`p-2 rounded-lg flex gap-1 ${ selectedCollection.length > 0 ? "cursor-pointer bg-red-500/30 text-red-500" : "bg-[#292929] text-zinc-600 cursor-not-allowed" } `}>
+                        onClick={() => deleteData(selectedData)}
+                        className={`p-2 rounded-lg flex gap-1 ${ selectedData.length > 0 ? "cursor-pointer bg-red-500/30 text-red-500" : "bg-[#292929] text-zinc-600 cursor-not-allowed" } `}>
                             Delete
                             <Trash2 />
                         </button>
@@ -119,7 +117,7 @@ export default function MainDashboard( { username , userId } : { username : stri
                         }}
                         className="flex select-none cursor-pointer">
                             <h1>
-                                {sort === "Default" ? "All Collections" : sort}
+                                {sort === "Default" ? `All ${type}` : sort}
                             </h1>
                             <div className="z-10">
                                 <ChevronDownIcon className={` ${ drop ? "rotate-180" : "" } `}/>
@@ -130,7 +128,7 @@ export default function MainDashboard( { username , userId } : { username : stri
                                             setSort(() => "Default")
                                         }} 
                                         className="p-2 hover:bg-[#171717] hover:text-white  hover:border-emerald-400 border rounded-xl text-center w-full text-black bg-emerald-400">
-                                            All Collections
+                                            All {type}
                                         </button>
                                     </div>
                                     <div>
@@ -175,55 +173,75 @@ export default function MainDashboard( { username , userId } : { username : stri
                         </div>
                     </div>
                 </div>
-                <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 px-8 gap-10">
-                    { recData.length > 0  ? recData.map( (data , index) => {
-                        return <div key={index} className={`rounded-lg px-5 py-3 bg-[#292929] border border-[#292929] ${selectedCollection.includes(data.id) ? "border-emerald-400" : ""} drop-shadow-xl flex flex-col gap-3`}>
+                <div className={` grid ${ type === "collection" ? "lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1" : "lg:grid-cols-2 md:grid-cols-1 "}  px-8 gap-10`}>
+                {recData.length > 0  ? recData.map( (data) => {
+                        return <div key={recData.indexOf(data)} className={`rounded-lg px-5 py-3 bg-[#292929] border border-[#292929] ${selectedData.includes(data.id) ? "border-emerald-400" : ""} drop-shadow-xl flex flex-col gap-3`}>
                         <div className="flex flex-col">
                             <div className=" flex justify-between items-center">
-                                <a href={`/dashboard/${data.id}`} className="text-lg font-mono select-none hover:text-blue-400 hover:underline cursor-pointer">
-                                    {data.title}
-                                </a>
+                                <a href={type === "collection" ?`/dashboard/${data.id}` : undefined} className="text-lg font-mono select-none hover:text-blue-400 hover:underline cursor-pointer">
+                                        {data.title}
+                                    </a>
                                 <div onClick={ () => {
-                                    if(selectedCollection.includes(data.id)){
-                                        setSelectedCollection(() => selectedCollection.filter(id => id !== data.id))
+                                    if(selectedData.includes(data.id)){
+                                        setselectedData(() => selectedData.filter(id => id !== data.id))
                                     }else{
-                                        setSelectedCollection(() => [...selectedCollection , data.id])
+                                        setselectedData(() => [...selectedData , data.id])
                                     }
                                 }}>
-                                {selectedCollection.includes(data.id) ? <SquareCheckBig className="hover:bg-zinc-500/20 p-1 size-9 rounded-xl cursor-pointer text-emerald-400"/> : <Square                                    
+                                {selectedData.includes(data.id) ? <SquareCheckBig className="hover:bg-zinc-500/20 p-1 size-9 rounded-xl cursor-pointer text-emerald-400"/> : <Square                                    
                                     className="hover:bg-zinc-500/20 p-1 size-9 rounded-xl cursor-pointer" /> }
                                 </div>
                             </div>
-                            <p className="text-md text-[#737373] select-none line-clamp-2">
+                            <p className="text-md text-white/40 select-none line-clamp-2">
                                 {data.description}  
                             </p>
                         </div>
                         <div>
-                        <div
-                        
-                        className="gap-2 gap-y-3 overflow-clip flex flex-wrap">
-                            {data.contentType.includes("WEBPAGE") ? <h1 className="border w-fit select-none px-3 py-1 rounded-full font-mono border-emerald-400 text-emerald-400 bg-emerald-400/10 drop-shadow-lg"> 
-                                WEBPAGE
-                            </h1> :undefined}
+                            <div
+                            className="gap-2 gap-y-3 overflow-clip flex flex-wrap">
+                                { data.contentType && data.contentType.includes("WEBPAGE") ? <h1 className="border w-fit select-none px-3 py-1 rounded-full font-mono border-emerald-400 text-emerald-400 bg-emerald-400/10 drop-shadow-lg"> 
+                                    WEBPAGE
+                                </h1> :undefined}
+                                    
+                                { data.contentType &&  data.contentType.includes("YOUTUBE") ? <h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-red-400 text-red-400 bg-red-400/10 drop-shadow-lg"> 
+                                    YOUTUBE
+                                </h1> :undefined}
                                 
-                            {data.contentType.includes("YOUTUBE") ? <h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-red-400 text-red-400 bg-red-400/10 drop-shadow-lg"> 
-                                YOUTUBE
-                            </h1> :undefined}
-                            
-                            {data.contentType.includes("NOTE") ?<h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-purple-400 text-purple-400 bg-purple-400/10 drop-shadow-lg"> 
-                                NOTE
-                            </h1>:undefined}
-                            
-                            {data.contentType.includes("CODE") ?<h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-blue-400 text-blue-400 bg-blue-400/10 drop-shadow-lg"> 
-                                CODE
-                            </h1>:undefined}
+                                { data.contentType &&  data.contentType.includes("NOTE") ?<h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-purple-400 text-purple-400 bg-purple-400/10 drop-shadow-lg"> 
+                                    NOTE
+                                </h1>:undefined}
+                                
+                                { data.contentType &&  data.contentType.includes("CODE") ?<h1 className="border w-fit px-3 py-1 select-none rounded-full font-mono border-blue-400 text-blue-400 bg-blue-400/10 drop-shadow-lg"> 
+                                    CODE
+                                </h1>:undefined}
+                            </div>
                         </div>
-                        </div>
-                            <h1 className="text-lg font-mono select-none">
-                                Number of Contents : {data.contents.length} 
-                            </h1>
+                        {
+                            type === "content" ? <div className="flex-col">
+                                    <div className="flex-row">
+                                        <h1 className="text-lg font-bold font-mono text-emerald-400">
+                                            Main Content
+                                        </h1>
+                                        { data.contentType && (data.contentType.includes("WEBPAGE") || data.contentType.includes("YOUTUBE")) ? <a 
+                                        className="hover:underline hover:text-emerald-400/60" href={data.mainContent}>{data.mainContent}</a> : <h1 className="font-mono overflow-hidden">
+                                            {data.mainContent} 
+                                        </h1>}
+                                    </div>
+                                    <div className="flex-row">
+                                        <h1 className="text-lg font-bold font-mono text-emerald-400">
+                                            Summary
+                                        </h1>
+                                        <h1 className="font-mono overflow-hidden ">
+                                            {data.summary} 
+                                        </h1>
+                                    </div>
+                            </div>
+                         : undefined}
+                           {type === "collection" ?  <h1 className="text-lg font-mono select-none">
+                                Number of Contents : {data.contents && data.contents.length} 
+                            </h1> : undefined}
                     </div>
-                    }) : ""}  
+                    }) : ""}
                 </div>
             </div>
         </>

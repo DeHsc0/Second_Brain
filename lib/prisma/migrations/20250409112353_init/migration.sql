@@ -34,7 +34,7 @@ CREATE TABLE "Contents" (
     "description" TEXT,
     "mainContent" TEXT NOT NULL,
     "summary" TEXT NOT NULL,
-    "contentType" "ContentType" NOT NULL,
+    "contentType" "ContentType"[],
     "collectionId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
@@ -60,4 +60,4 @@ ALTER TABLE "Collections" ADD CONSTRAINT "Collections_clerkId_fkey" FOREIGN KEY 
 ALTER TABLE "Contents" ADD CONSTRAINT "Contents_clerkId_fkey" FOREIGN KEY ("clerkId") REFERENCES "User"("clerkId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Contents" ADD CONSTRAINT "Contents_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "Collections"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Contents" ADD CONSTRAINT "Contents_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "Collections"("id") ON DELETE CASCADE ON UPDATE CASCADE;

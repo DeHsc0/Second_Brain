@@ -1,41 +1,41 @@
 "use client"
 
-import { Brain } from "lucide-react"
-import { motion} from "framer-motion"
+import { Manrope } from "next/font/google"
 import { SignUpButton } from '@clerk/nextjs'
+import { Brain } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-export default function NavBar () {
+const manrope = Manrope({
+    subsets : ["latin"]
+})
+
+export default function NavBar ({ signedIn } : {signedIn : boolean}) {
+
+    const router = useRouter()
 
     return (
-        <div className="px-[102px] py-4 flex justify-between items-center border-b-1 bg-[#141414] border-[#282828]">
-            <div className="flex gap-2 text-[16px]">
-                <Brain className="text-emerald-400"/>
-                <h1 className="font-mono">
-                    SECOND BRAIN
-                </h1>
-            </div>
-            <div className="flex gap-10 items-center">
-                <a href="/pricing" className="font-mono">
-                    PRICING
+        <div className={`${manrope.className} px-4 md:px-[102px] py-4 flex justify-between items-center border-b border-[#282828] bg-[#141414] sticky top-0 z-50`}>
+            <a className="flex gap-2 text-[16px]" href="/">
+                <Brain className="lucide lucide-brain text-emerald-400"/>
+                <h1 className="font-mono">SECOND BRAIN</h1>
+            </a>
+            <div className="flex gap-4 md:gap-10 items-center">
+                <a className="font-mono hidden md:block" href="/pricing">
+                PRICING
                 </a>
-                <a href="/features" className="font-mono">
-                    FEATURES
+                <a className="font-mono hidden md:block" href="/features">
+                FEATURES
                 </a>
-                <SignUpButton mode="redirect">
-                    <motion.button
-
-                    transition={{
-                        type : "spring",
-                        duration : 0
-                    }}
-
-                    whileTap={{
-                        scale : 0.9
-                    }}
-                    className="font-mono rounded-full px-7 py-2 bg-[#292929] duration-300 hover:text-black  hover:bg-emerald-400/100 ">
+                {signedIn ? <button 
+                onClick={() => router.push("/dashboard")}
+                className="font-mono rounded-full px-4 md:px-7 py-2 bg-[#292929] duration-300 hover:text-black hover:bg-emerald-400/100" tabIndex={0}>
+                    Go to Dashboard
+                </button> : <SignUpButton forceRedirectUrl={"/dashboard"}>
+                    <button
+                    className="font-mono rounded-full px-4 md:px-7 py-2 bg-[#292929] duration-300 hover:text-black hover:bg-emerald-400/100" tabIndex={0}>
                         START FOR FREE
-                    </motion.button>
-                </SignUpButton>
+                    </button>
+                </SignUpButton> }
             </div>
         </div>
     )

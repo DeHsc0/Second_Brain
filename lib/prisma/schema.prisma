@@ -36,20 +36,19 @@ model Contents {
   description  String?
   mainContent  String
   summary      String
-  contentType  ContentType
+  contentType  ContentType[]
   collectionId String
   createdAt    DateTime              @default(now())
   updateAt     DateTime              @updatedAt
   embedding    Unsupported("vector")
   clerkId      String
   user         User                  @relation(fields: [clerkId], references: [clerkId])
-  collection   Collections           @relation(fields: [collectionId], references: [id])
+  collection   Collections           @relation(fields: [collectionId], references: [id] , onDelete: Cascade)
 }
 
 enum ContentType {
   WEBPAGE
   YOUTUBE
   CODE
-  INSTAGRAM
   NOTE
 }

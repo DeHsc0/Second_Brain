@@ -1,29 +1,30 @@
 
+import { ContentType } from "@prisma/client"
 import z from "zod"
 
-export const CollectionSchema = z.object({
-    title: z.string().optional(),
+export const CreationSchema = z.object({
+    title: z.string(),
     description: z.string().optional(),
-    clerkId: z.string().optional(),
+    clerkId: z.string(),
+    mainContent: z.string().optional(),
     contentType : z.array(
         z.enum([
             "WEBPAGE", "YOUTUBE", "CODE", "NOTE"
         ])
-    ).optional(),
-    id : z.string().optional()
+    )
 })
 
-export const ContentSchema = z.object({
-    id : z.string().optional(),
-    title : z.string(),
-    description : z.string().optional(),
-    mainContent : z.string(),
-    contentType : 
-        z.enum([
-            "WEBPAGE", "YOUTUBE", "CODE", "NOTE"
-        ])
-    .optional(),
+export const DeleteDataSchema = z.object({
+    ids : z.array(z.string())
 })
+
+
+ export const UpdateContentSchema = z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    description: z.string().optional(),
+  });
+  
 
 export interface aiResponse {
     contentType : "CODE" | "NOTE" | "NONE",
@@ -37,5 +38,17 @@ export interface DashbordProvider {
     addAlert : (alert : string) => void,
     removeAlert : (alert : string) => void,
     sortType : Sort,
-    changeSort : (sort : Sort) => void    // selected id's , 
+    changeSort : (sort : Sort) => void  
 } 
+
+export interface RecCollectionData {
+    id : string 
+    title : string
+    description ?: string
+    contents : []
+    contentType : ContentType[]
+    mainContent ?: string
+    summary ?: string
+    similarity ?: number
+    
+}

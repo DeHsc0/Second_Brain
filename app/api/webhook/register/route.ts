@@ -63,7 +63,6 @@ export async function POST(req: Request) {
                 }
             })
 
-            console.log(response)
 
             return new Response(JSON.stringify({ 
                 success: "User created successfully" 
@@ -90,7 +89,6 @@ export async function POST(req: Request) {
                 }
             })
 
-            console.log(response)
 
             return new Response(JSON.stringify({ 
                 success: "User created successfully" 

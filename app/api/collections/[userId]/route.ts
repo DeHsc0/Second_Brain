@@ -1,15 +1,9 @@
-// TODO : valid Status codes
-// http://localhost:3000/api/collections?userId=59867c63-eaf5-4330-96e2-2e06eaf42097&id=373077e0-aa18-4eb0-8fdc-80467a6622c5
+
 
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma/prisma";
-import { CollectionSchema } from "@/lib/types/types";
+import { CreationSchema, DeleteDataSchema} from "@/lib/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-
-// POST : 
-// GET : userId contentType 
-// PUT : userId collection Id 
-// DELETE : userId collection Id
 
 export async function GET(req : NextRequest , { params }: { params: { userId: string } }){
     
@@ -20,7 +14,7 @@ export async function GET(req : NextRequest , { params }: { params: { userId: st
         if(!userId){
             return new Response(JSON.stringify({
                 message : "Invalid Input"
-            }) , {status : 302})
+            }) , {status : 400})
         }
 
         const response = await prisma.collections.findMany({
@@ -44,7 +38,7 @@ export async function GET(req : NextRequest , { params }: { params: { userId: st
         return new Response(JSON.stringify({
             message : "Someting went wrong",
             data : e
-        }) , {status : 400})
+        }) , {status : 500})
     }
 }
 
@@ -53,22 +47,21 @@ export async function POST(req : NextRequest){
     try{
         const body = await req.json()
 
-        const validData = CollectionSchema.safeParse(body)
+        const validData = CreationSchema.safeParse(body)
 
 
-        if(!validData.success || !validData.data.contentType || !validData.data.description || !validData.data.title || !validData.data.clerkId){ // TODO remove the description it should be optional 
-            console.log(validData)
+        if(!validData.success ){  
             return new Response(JSON.stringify({
                 message : "Invalid input",
                 data : validData
-            }) , {status : 302})
+            }) , {status : 400})
         }
 
 
         const collections = await prisma.collections.create({
             data : {
                 title : validData.data.title,
-                description : validData.data.description,
+                description : validData.data.description || "",
                 clerkId : validData.data.clerkId, 
                 contentType : validData.data.contentType
             },
@@ -81,13 +74,11 @@ export async function POST(req : NextRequest){
             }
         })
 
-        console.log(collections)
-
         return new Response(JSON.stringify({
             message : "Collection Created Successfully",
-            data : collections
+            data : [collections]
         }) , {
-            status : 200 
+            status : 201
         })
     }
 
@@ -96,11 +87,11 @@ export async function POST(req : NextRequest){
         if(e instanceof PrismaClientKnownRequestError){
             return new Response(JSON.stringify({
                 message : e 
-            }))
+            }) , {status : 500})
         }
         else return new Response( JSON.stringify({
             message : e
-        }))
+        }) , {status : 500})
     }
 }
 
@@ -112,18 +103,18 @@ export async function DELETE(req : NextRequest , { params }: { params: { userId:
 
         const body = await req.json()
 
-        const validData = CollectionSchema.safeParse(body)
+        const validData = DeleteDataSchema.safeParse(body)
 
-        if(!validData.success || !validData.data.id){
+        if(!validData.success || !Array.isArray(validData.data.ids)){
             return new Response(JSON.stringify({
                 message : "Invalid Input",
                 data : validData
-            }) , {status : 302})
+            }) , {status : 400})
         }
 
-        const response = await prisma.collections.delete({
+        const response = await prisma.collections.deleteMany({
             where : {
-                id : validData.data.id,
+                id : { in : validData.data.ids},
                 clerkId : userId,
             }
         })
@@ -137,6 +128,6 @@ export async function DELETE(req : NextRequest , { params }: { params: { userId:
         return new Response(JSON.stringify({
             message : "Something went wrong",
             data : e
-        }) , {status : 400})
+        }) , {status : 500})
     }
 }
