@@ -1,7 +1,6 @@
 "use client"
 
 import { Manrope } from 'next/font/google'
-import { motion } from "framer-motion"
 import {Check} from "lucide-react"
 
 const manrope = Manrope({

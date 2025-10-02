@@ -6,7 +6,6 @@ import axios from "axios"
 import CreationModel from "./CreationModel";
 import { DataContext } from "@/providers/dashboardProvider";
 import { Alert } from "./Alert";
-import { ContentType } from "@prisma/client";
 
 
 

@@ -1,7 +1,7 @@
 import { DataContext } from "@/providers/dashboardProvider"
 import { ContentType } from "@prisma/client"
 import axios, { AxiosResponse } from "axios"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 
 export default function CreationModel ({userId , closeModal , addCreatedData , type , collectionID} : {userId : string , closeModal : () => void , addCreatedData : (response : AxiosResponse) => void , type : "collection" | "content" , collectionID : string}) {
 
