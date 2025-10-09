@@ -52,7 +52,7 @@ export async function POST(req : NextRequest , {params} : { params : { collectio
         ${additionalContent ? `Additional Content: ${additionalContent}` : null}
         ContentType: ${validData.data.contentType}`
             
-        const insertData = async ( model : GenerativeModel , embeddingModel : GenerativeModel , prisma : PrismaClient , prompt : string) : Promise<any> => {      
+        const insertData = async ( model : GenerativeModel , embeddingModel : GenerativeModel  , prompt : string) : Promise<any> => {      
             
             const result = await model.generateContent(prompt);
                         
@@ -68,7 +68,7 @@ export async function POST(req : NextRequest , {params} : { params : { collectio
         
             const contentTypeArray = `{${validData.data.contentType.join(',')}}`;
 
-            const response = await prisma.$executeRaw`     
+            await prisma.$executeRaw`     
             INSERT INTO "Contents" (
                 "id", "title", "description", "clerkId", "mainContent", 
                 "summary", "contentType", "collectionId", "embedding", 
@@ -80,13 +80,14 @@ export async function POST(req : NextRequest , {params} : { params : { collectio
                 ${contentTypeArray}::"ContentType"[], ${collectionID}, 
                 ${embedding.embedding.values}, NOW(), NOW()
             )`;
+
             const insertedContent = await prisma.$queryRaw`
                 SELECT "id", "title", "mainContent", "summary", "contentType" FROM "Contents"
                 WHERE "id" = ${id}`;
                 return insertedContent
         };
         
-        const data = await insertData(model , embeddingModel , prisma , prompt)
+        const data = await insertData(model , embeddingModel , prompt)
         return new Response(JSON.stringify({
             message : "Content Created Successfully",
             data

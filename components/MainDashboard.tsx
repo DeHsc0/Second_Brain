@@ -9,7 +9,7 @@ import { Alert } from "./Alert";
 
 
 
-export default function MainDashboard( { username , userId , type , collectionID , searchResuts , search } : { username : string , userId : string  , type : "collection" | "content" , collectionID : string  , searchResuts ?: RecCollectionData[]  , search ?: string }){
+export default function MainDashboard( { username , userId , type , collectionID , searchResuts} : { username : string , userId : string  , type : "collection" | "content" , collectionID : string  , searchResuts ?: RecCollectionData[]  , search ?: string }){
 
     const [sort , setSort] = useState<Sort>("Default")
     const [drop , setDrop] = useState(false)
@@ -29,7 +29,7 @@ export default function MainDashboard( { username , userId , type , collectionID
 
             return 
         }
-        catch(e){
+        catch(_e){
             alert?.addAlert(`Unable to fetch the ${type}`)
         }
     }

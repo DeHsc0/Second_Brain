@@ -4,6 +4,7 @@ import { DataContext } from "@/providers/dashboardProvider"
 import { useClerk } from "@clerk/nextjs"
 import {ChevronsUpDown , Search , Folder, Star, History, Share , Brain, Github, LogOut} from "lucide-react"
 import { Manrope } from 'next/font/google'
+import Image from "next/image"
 import { useContext } from "react"
 
 const manrope = Manrope({
@@ -13,7 +14,7 @@ const manrope = Manrope({
 export default function SideBar( {userId , username , imageUrl , type } : {userId : string , imageUrl : string , username : string , type : "collection" | "content"} ){
 
     const sort = useContext(DataContext)
-    const { openUserProfile , redirectToSignIn , signOut } = useClerk()
+    const { openUserProfile , signOut } = useClerk()
 
     if(!userId || !username || !sort){
         return
@@ -24,7 +25,7 @@ export default function SideBar( {userId , username , imageUrl , type } : {userI
         <div className={`${manrope.style} flex flex-col justify-start gap-6 py-7 px-4 md:px-2 lg:px-10 h-screen w-[280px] md:w-[300px] lg:w-[316px] bg-[#171717] border-r border-[#292929] fixed lg:static left-0 transform -translate-x-full lg:translate-x-0 transition-transform z-20`}>
             <div className="flex justify-between w-full items-center">
                 <div className="flex gap-2">
-                    { userId ? <img src={`${imageUrl}`} alt="" className="size-8 rounded-full" /> : ""}
+                    { userId ? <Image src={`${imageUrl}`} alt="" className="size-8 rounded-full" /> : ""}
                     <h1 className="text-2xl">
                         {username.toUpperCase()}
                     </h1>

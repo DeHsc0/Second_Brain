@@ -41,8 +41,6 @@ export async function POST(req: Request) {
             error: "Invalid webhook signature" 
         }), { status: 401 })
     }
-
-    const { id } = evt.data
     const evtType = evt.type
 
     if (evtType === "user.created" && evt.data) {
@@ -55,7 +53,7 @@ export async function POST(req: Request) {
                 }), { status: 400 })
             }
 
-            const response = await prisma.user.create({
+             await prisma.user.create({
                 data: {
                     email: email_addresses[0].email_address,
                     clerkId: id,
@@ -83,7 +81,7 @@ export async function POST(req: Request) {
             }), { status: 400 })
             }
 
-            const response = await prisma.user.delete({
+            await prisma.user.delete({
                 where : {
                     clerkId : id
                 }
