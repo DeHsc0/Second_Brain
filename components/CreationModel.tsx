@@ -30,7 +30,7 @@ export default function CreationModel ({userId , closeModal , addCreatedData , t
             addCreatedData(response)
             return response
     }
-        catch(_e){
+        catch{
             alert?.addAlert("Something Went Wrong")
         }
     }    

@@ -29,7 +29,7 @@ export default function MainDashboard( { username , userId , type , collectionID
 
             return 
         }
-        catch(_e){
+        catch{
             alert?.addAlert(`Unable to fetch the ${type}`)
         }
     }

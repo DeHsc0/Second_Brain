@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma/prisma";
 import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema} from "@/lib/types/types";
 import { extractAdditionalContent} from "@/lib/Utils/utils";
 import { GenerativeModel } from "@google/generative-ai";
-import { PrismaClient } from "@prisma/client/extension";
 import { NextRequest } from "next/server";
 
 export async function POST(req : NextRequest , {params} : { params : { collectionID : string } }){
@@ -52,7 +51,7 @@ export async function POST(req : NextRequest , {params} : { params : { collectio
         ${additionalContent ? `Additional Content: ${additionalContent}` : null}
         ContentType: ${validData.data.contentType}`
             
-        const insertData = async ( model : GenerativeModel , embeddingModel : GenerativeModel  , prompt : string) : Promise<any> => {      
+        const insertData = async ( model : GenerativeModel , embeddingModel : GenerativeModel  , prompt : string) : Promise<unknown> => {      
             
             const result = await model.generateContent(prompt);
                         
