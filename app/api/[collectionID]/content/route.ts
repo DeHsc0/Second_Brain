@@ -5,7 +5,7 @@ import { extractAdditionalContent} from "@/lib/Utils/utils";
 import { GenerativeModel } from "@google/generative-ai";
 import { NextRequest } from "next/server";
 
-export async function POST(req : NextRequest , {params} : { params : { collectionID : string } }){
+export async function POST(req : NextRequest , { params }: { params: Promise<{ collectionID: string }>}){
 
     try{
 
@@ -100,7 +100,7 @@ export async function POST(req : NextRequest , {params} : { params : { collectio
     }
 }
 
-export async function GET(req: NextRequest , {params} : { params : { collectionID : string } } ) {
+export async function GET(req: NextRequest , { params }: { params: Promise<{ collectionID: string }>} ) {
     
     try{
         const { collectionID } = await params
@@ -143,11 +143,11 @@ export async function GET(req: NextRequest , {params} : { params : { collectionI
     }
   }
 
-  export async function PUT( req : NextRequest ,  {params} : { params : { collectionID : string } }){
+  export async function PUT( req : NextRequest ,  { params }: { params: Promise<{ collectionID: string }>}){
 
     try{
 
-        const { collectionID } = params
+        const { collectionID } = await params
 
         const { searchParams } = new URL(req.url)
 
@@ -191,11 +191,11 @@ export async function GET(req: NextRequest , {params} : { params : { collectionI
     }
 }
 
-export async function DELETE( req : NextRequest ,  {params} : { params : { collectionID : string } } ){
+export async function DELETE( req : NextRequest ,  { params }: { params: Promise<{ collectionID: string }>} ){
 
     try{
 
-        const { collectionID } = params
+        const { collectionID } = await params
 
         const { searchParams } = new URL(req.url)
 
