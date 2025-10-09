@@ -6,7 +6,7 @@ import { X } from "lucide-react"
 import { motion , AnimatePresence } from "framer-motion"
 
 
-import { useContext, useEffect, useState } from "react"
+import { useContext} from "react"
 import { DataContext } from "@/providers/dashboardProvider"
 
 

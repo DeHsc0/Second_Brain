@@ -1,7 +1,7 @@
 import { embeddingModel, model } from "@/lib/ai/geminiUtils";
 import { prisma } from "@/lib/prisma/prisma";
 import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema} from "@/lib/types/types";
-import { extractAdditionalContent, extractTextFromUrl, getYouTubeTranscript } from "@/lib/Utils/utils";
+import { extractAdditionalContent} from "@/lib/Utils/utils";
 import { GenerativeModel } from "@google/generative-ai";
 import { PrismaClient } from "@prisma/client/extension";
 import { NextRequest } from "next/server";

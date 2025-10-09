@@ -10,7 +10,7 @@ export default  function Home() {
   const {isSignedIn , isLoaded} = useAuth()
     
     if (!isLoaded) {
-        return null
+        return undefined
     }
 
 
