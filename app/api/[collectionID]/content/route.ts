@@ -100,7 +100,7 @@ export async function POST(req : NextRequest , { params }: { params: Promise<{ c
     }
 }
 
-export async function GET(req: NextRequest , { params }: { params: Promise<{ collectionID: string }>} ) {
+export async function GET(req: NextRequest , params : { collectionID: string } ) {
     
     try{
         const { collectionID } = await params
