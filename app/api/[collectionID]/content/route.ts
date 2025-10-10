@@ -100,7 +100,7 @@ export async function POST(req : NextRequest , { params }: { params: Promise<{ c
     }
 }
 
-export async function GET(req: NextRequest , params : { collectionID: string } ) {
+export async function GET(req: NextRequest , params : any) {
     
     try{
         const { collectionID } = await params
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest , params : { collectionID: string } )
         const data = await prisma.contents.findMany({
             where : {
                 clerkId : userID,
-                collectionId : collectionID
+                collectionId : collectionID as any
             },
             select : {
                 id : true,
