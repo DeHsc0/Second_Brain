@@ -54,5 +54,5 @@ export interface RecCollectionData {
 }
 
 export interface ExclusiveParams {
-    collectionID : string
+    data : Promise<{collectionID : string}>
 }
