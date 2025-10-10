@@ -52,3 +52,7 @@ export interface RecCollectionData {
     similarity ?: number
     
 }
+
+export interface ExclusiveParams {
+    collectionID : string
+}
