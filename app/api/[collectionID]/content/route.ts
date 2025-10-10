@@ -1,11 +1,11 @@
 import { embeddingModel, model } from "@/lib/ai/geminiUtils";
 import { prisma } from "@/lib/prisma/prisma";
-import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema} from "@/lib/types/types";
+import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema , ExclusiveParams} from "@/lib/types/types";
 import { extractAdditionalContent} from "@/lib/Utils/utils";
 import { GenerativeModel } from "@google/generative-ai";
 import { NextRequest } from "next/server";
 
-export async function POST(req : NextRequest , { params }: { params: Promise<{ collectionID: string }>}){
+export async function POST(req : NextRequest , params : ExclusiveParams){
 
     try{
 
@@ -100,7 +100,7 @@ export async function POST(req : NextRequest , { params }: { params: Promise<{ c
     }
 }
 
-export async function GET(req: NextRequest , params : any) {
+export async function GET(req: NextRequest , params : ExclusiveParams) {
     
     try{
         const { collectionID } = await params
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest , params : any) {
         const data = await prisma.contents.findMany({
             where : {
                 clerkId : userID,
-                collectionId : collectionID as any
+                collectionId : collectionID 
             },
             select : {
                 id : true,
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest , params : any) {
     }
   }
 
-  export async function PUT( req : NextRequest ,  { params }: { params: Promise<{ collectionID: string }>}){
+  export async function PUT( req : NextRequest , params : ExclusiveParams){
 
     try{
 
@@ -191,7 +191,7 @@ export async function GET(req: NextRequest , params : any) {
     }
 }
 
-export async function DELETE( req : NextRequest ,  { params }: { params: Promise<{ collectionID: string }>} ){
+export async function DELETE( req : NextRequest ,  params : ExclusiveParams ){
 
     try{
 
