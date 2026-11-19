@@ -6,7 +6,7 @@
     "db:generate" : "npx prisma generate --schema ./lib/prisma/schema.prisma",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next build && next start",
     "lint": "next lint"
   },
   "dependencies": {
