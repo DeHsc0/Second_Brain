@@ -1,15 +1,12 @@
+// use prisma-8
+types {
+  
+  Embedding1536 = pgvector.Vector(1536)
 
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
 }
 
 model User {
-  id          String        @id @default(uuid())
+  id          String        @id @onCreate(uuid())
   username    String        @unique
   clerkId     String        @unique
   email       String        @unique
@@ -18,19 +15,19 @@ model User {
 }
 
 model Collections {
-  id          String        @id @default(uuid())
+  id          String        @id @onCreate(uuid())
   title       String
   description String
   contentType ContentType[]
   createdAt   DateTime      @default(now())
-  updateAt    DateTime      @updatedAt
+  updateAt    DateTime       @onUpdate(now())
   clerkId     String
   user        User          @relation(fields: [clerkId], references: [clerkId])
   contents    Contents[]
 }
 
 model Contents {
-  id           String                @id @default(uuid())
+  id           String                @id @onCreate(uuid())
   title        String
   description  String?
   mainContent  String
@@ -38,8 +35,8 @@ model Contents {
   contentType  ContentType[]
   collectionId String
   createdAt    DateTime              @default(now())
-  updateAt     DateTime              @updatedAt
-  embedding    Unsupported("vector")
+  updateAt     DateTime               @onUpdate(now())
+  embedding    Embedding1536
   clerkId      String
   user         User                  @relation(fields: [clerkId], references: [clerkId])
   collection   Collections           @relation(fields: [collectionId], references: [id] , onDelete: Cascade)

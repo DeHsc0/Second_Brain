@@ -13,7 +13,10 @@
     "@clerk/nextjs": "^6.39.9",
     "@clerk/themes": "^2.4.57",
     "@google/generative-ai": "^0.24.1",
+    "@prisma/cli-engine": "^0.10.0",
     "@prisma/client": "^6.19.3",
+    "@prisma/orm-extension-pgvector": "8.0.0-rc.24",
+    "@prisma/orm-postgres": "8.0.0-rc.24",
     "axios": "^1.21.1",
     "cheerio": "^1.2.0",
     "dotenv-cli": "^10.0.0",
@@ -38,7 +41,7 @@
     "dotenv": "^18.0.10",
     "eslint": "^9.39.5",
     "eslint-config-next": "15.2.1",
-    "prisma": "^6.19.3",
+    "prisma": "^8.0.0-rc.34",
     "tailwindcss": "^4.3.5",
     "typescript": "^5.9.3"
   }
