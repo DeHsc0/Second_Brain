@@ -1,7 +1,7 @@
 
 
 import { NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma/prisma";
+import { db } from "@/lib/prisma/prisma";
 import { CreationSchema, DeleteDataSchema} from "@/lib/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
@@ -16,6 +16,18 @@ export async function GET(req : NextRequest , { params }: { params: { userId: st
                 message : "Invalid Input"
             }) , {status : 400})
         }
+
+        const response = await db.orm.public.Collections.where({
+
+            clerkId : userId
+
+        }).select(        
+            'contentType',
+            'id',
+            'title',
+            'description'
+            
+            ).all()
 
         const response = await prisma.collections.findMany({
             where : {

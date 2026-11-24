@@ -9,3 +9,4 @@ export const db = postgres({
   url: process.env['DATABASE_URL']!,
   extensions: [pgvector],
 });
+
