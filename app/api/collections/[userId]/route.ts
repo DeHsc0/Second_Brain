@@ -1,46 +1,27 @@
 
 
 import { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server"
 import { db } from "@/lib/prisma/prisma";
 import { CreationSchema, DeleteDataSchema} from "@/lib/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { collectMeta } from "next/dist/build/utils";
 
-export async function GET(req : NextRequest , { params }: { params: { userId: string } }){
+export async function GET(req : NextRequest){
     
     try {
 
-        const {userId} = await params 
+        const { isAuthenticated, userId } = await auth()
 
-        if(!userId){
-            return new Response(JSON.stringify({
-                message : "Invalid Input"
-            }) , {status : 400})
+        if (!isAuthenticated) {
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
         }
 
-        const response = await db.orm.public.Collections.where({
-
-            clerkId : userId
-
-        }).select(        
-            'contentType',
-            'id',
-            'title',
-            'description'
-            
-            ).all()
-
-        const response = await prisma.collections.findMany({
-            where : {
-                clerkId : userId
-            },
-            select : {
-                contentType : true,
-                contents : true,
-                id : true,
-                title : true,
-                description : true,
-            }
-        })
+        const response = await db.orm.public.Collections
+        .where({ clerkId: userId })
+        .select("id", "title", "description", "contentType")
+        .include("contents")
+        .all();
 
         return new Response(JSON.stringify({
             data : response
@@ -57,10 +38,16 @@ export async function GET(req : NextRequest , { params }: { params: { userId: st
 export async function POST(req : NextRequest){
 
     try{
+
+        const { isAuthenticated, userId } = await auth()
+
+        if (!isAuthenticated) {
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+        }
+
         const body = await req.json()
 
         const validData = CreationSchema.safeParse(body)
-
 
         if(!validData.success ){  
             return new Response(JSON.stringify({
@@ -69,22 +56,12 @@ export async function POST(req : NextRequest){
             }) , {status : 400})
         }
 
-
-        const collections = await prisma.collections.create({
-            data : {
+        const collections = await db.orm.public.Collections.select("id" , "title" , "description" , "contentType").create({
                 title : validData.data.title,
                 description : validData.data.description || "",
-                clerkId : validData.data.clerkId, 
+                clerkId : userId, 
                 contentType : validData.data.contentType
-            },
-            select : {
-                contentType : true,
-                contents : true,
-                id : true,
-                title : true,
-                description : true,
-            }
-        })
+            })
 
         return new Response(JSON.stringify({
             message : "Collection Created Successfully",
@@ -107,11 +84,15 @@ export async function POST(req : NextRequest){
     }
 }
 
-export async function DELETE(req : NextRequest , { params }: { params: { userId: string } }){
+export async function DELETE(req : NextRequest){
 
     try {
 
-        const {userId} = await params
+        const { isAuthenticated, userId } = await auth()
+
+        if (!isAuthenticated) {
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+        }
 
         const body = await req.json()
 
@@ -124,16 +105,11 @@ export async function DELETE(req : NextRequest , { params }: { params: { userId:
             }) , {status : 400})
         }
 
-        const response = await prisma.collections.deleteMany({
-            where : {
-                id : { in : validData.data.ids},
-                clerkId : userId,
-            }
-        })
+        const response = (await db.orm.public.Collections.where((col) => col.id.in(validData.data.ids)).where({ clerkId : userId}).deleteAll())
 
         return new Response(JSON.stringify({
             message : "Deleted Successfully",
-            data : response
+            data : response.length
         }) , {status : 200})
     }
     catch(e){

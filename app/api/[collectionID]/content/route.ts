@@ -1,5 +1,5 @@
 import { embeddingModel, model } from "@/lib/ai/geminiUtils";
-import { prisma } from "@/lib/prisma/prisma";
+import { db } from "@/lib/prisma/prisma";
 import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema , ExclusiveParams} from "@/lib/types/types";
 import { extractAdditionalContent} from "@/lib/Utils/utils";
 import { GenerativeModel } from "@google/generative-ai";

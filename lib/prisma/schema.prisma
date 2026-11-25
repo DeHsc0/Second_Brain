@@ -20,7 +20,7 @@ model Collections {
   description String
   contentType ContentType[]
   createdAt   DateTime      @default(now())
-  updateAt    DateTime       @onUpdate(now())
+  updateAt    DateTime      @default(now()) @onUpdate(now())
   clerkId     String
   user        User          @relation(fields: [clerkId], references: [clerkId])
   contents    Contents[]
@@ -35,7 +35,7 @@ model Contents {
   contentType  ContentType[]
   collectionId String
   createdAt    DateTime              @default(now())
-  updateAt     DateTime               @onUpdate(now())
+  updateAt     DateTime              @default(now()) @onUpdate(now())
   embedding    Embedding1536
   clerkId      String
   user         User                  @relation(fields: [clerkId], references: [clerkId])

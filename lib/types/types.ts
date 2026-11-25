@@ -5,7 +5,6 @@ import z from "zod"
 export const CreationSchema = z.object({
     title: z.string(),
     description: z.string().optional(),
-    clerkId: z.string(),
     mainContent: z.string().optional(),
     contentType : z.array(
         z.enum([
