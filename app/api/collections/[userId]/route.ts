@@ -105,7 +105,7 @@ export async function DELETE(req : NextRequest){
             }) , {status : 400})
         }
 
-        const response = (await db.orm.public.Collections.where((col) => col.id.in(validData.data.ids)).where({ clerkId : userId}).deleteAll())
+        const response = await db.orm.public.Collections.where((col) => col.id.in(validData.data.ids)).where({ clerkId : userId}).deleteAll()
 
         return new Response(JSON.stringify({
             message : "Deleted Successfully",

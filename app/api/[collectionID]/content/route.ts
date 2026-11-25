@@ -67,23 +67,31 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
         
             const contentTypeArray = `{${validData.data.contentType.join(',')}}`;
 
-            await prisma.$executeRaw`     
+            const res = await db.query(db.raw.sql`     
+            
             INSERT INTO "Contents" (
                 "id", "title", "description", "clerkId", "mainContent", 
                 "summary", "contentType", "collectionId", "embedding", 
                 "createdAt", "updateAt"
             ) 
             VALUES (
-                ${id}, ${validData.data.title}, ${validData.data.description}, 
-                ${userID}, ${validData.data.mainContent}, ${parsedJson.summary}, 
+            
+                ${id}, ${validData.data.title}, ${validData.data.description || ""}, 
+                ${userID}, ${validData.data.mainContent || ""}, ${parsedJson.summary}, 
                 ${contentTypeArray}::"ContentType"[], ${collectionID}, 
-                ${embedding.embedding.values}, NOW(), NOW()
-            )`;
+                [${embedding.embedding.values.join(",")}]::vector, NOW(), NOW()
+            
+            )`.returnsRow({ 
+            
+                id : db.sql.public.Contents.columns.id,
+                title : db.sql.public.Contents.columns.title,
+                mainContent : db.sql.public.Contents.columns.mainContent,
+                summary : db.sql.public.Contents.columns.summary, 
+                contentType : db.sql.public.Contents.columns.contentType
+            
+            }).build())
 
-            const insertedContent = await prisma.$queryRaw`
-                SELECT "id", "title", "mainContent", "summary", "contentType" FROM "Contents"
-                WHERE "id" = ${id}`;
-                return insertedContent
+            return res
         };
         
         const data = await insertData(model , embeddingModel , prompt)
@@ -115,20 +123,27 @@ export async function GET(req: NextRequest , params : ExclusiveParams) {
             }) , {status : 401})
         }
 
-        const data = await prisma.contents.findMany({
-            where : {
-                clerkId : userID,
-                collectionId : collectionID 
-            },
-            select : {
-                id : true,
-                title : true,
-                summary : true,
-                description : true,
-                mainContent : true,
-                contentType : true            
-            }
-        });
+        const data = await db.orm.public.Contents.where({
+
+            clerkId : userID, 
+            collectionId : collectionID
+
+        }).select("id" , "title" , "summary" , "description" , "mainContent" , "contentType").all()
+
+        // const data = await prisma.contents.findMany({
+        //     where : {
+        //         clerkId : userID,
+        //         collectionId : collectionID 
+        //     },
+        //     select : {
+        //         id : true,
+        //         title : true,
+        //         summary : true,
+        //         description : true,
+        //         mainContent : true,
+        //         contentType : true            
+        //     }
+        // });
         
         return new Response(JSON.stringify({
         message: "Success",
@@ -169,14 +184,22 @@ export async function GET(req: NextRequest , params : ExclusiveParams) {
             ...(validData.data.description !== undefined && { description: validData.data.description })
           };
 
-        const response = await prisma.contents.update({
-            where : {
-                id : validData.data.id,
-                clerkId : userID,
-                collectionId : collectionID
-            },
-            data : updateData
-        })    
+        const response = await db.orm.public.Contents.where({
+
+            id : validData.data.id,
+            clerkId : userID,
+            collectionId : collectionID
+            
+        }).update(updateData)
+
+        // const response = await prisma.contents.update({
+        //     where : {
+        //         id : validData.data.id,
+        //         clerkId : userID,
+        //         collectionId : collectionID
+        //     },
+        //     data : updateData
+        // }) 
 
         return new Response(JSON.stringify({
             message : "Content updated",
@@ -213,13 +236,15 @@ export async function DELETE( req : NextRequest ,  params : ExclusiveParams ){
             }) , {status : 400})
         }
 
-        const response = await prisma.contents.deleteMany({
-            where : {
-                id : { in : validData.data.ids},
-                collectionId : collectionID,
-                clerkId : userID
-            }
-        })    
+        const response = await db.orm.public.Contents.where((col) => col.id.in(validData.data.ids)).where({collectionId : collectionID , clerkId : userID }).deleteAndCount()
+
+        // const response = await prisma.contents.deleteMany({
+        //     where : {
+        //         id : { in : validData.data.ids},
+        //         collectionId : collectionID,
+        //         clerkId : userID
+        //     }
+        // })    
 
         return new Response(JSON.stringify({
             message : "Content deleted",

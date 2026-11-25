@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma/prisma";
+import { db } from "@/lib/prisma/prisma";
 
 export async function POST(req: Request) {
     const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
@@ -53,12 +53,12 @@ export async function POST(req: Request) {
                 }), { status: 400 })
             }
 
-             await prisma.user.create({
-                data: {
-                    email: email_addresses[0].email_address,
-                    clerkId: id,
-                    username: username,
-                }
+             await db.orm.public.User.create({
+                
+                email: email_addresses[0].email_address,
+                clerkId: id,
+                username: username,
+                
             })
 
 
@@ -81,15 +81,13 @@ export async function POST(req: Request) {
             }), { status: 400 })
             }
 
-            await prisma.user.delete({
-                where : {
-                    clerkId : id
-                }
-            })
+            await db.orm.public.User.where({
+                clerkId : id
+            }).delete()
 
 
             return new Response(JSON.stringify({ 
-                success: "User created successfully" 
+                success: "User deleted successfully" 
             }), { status: 201 })
         }
         catch(err){

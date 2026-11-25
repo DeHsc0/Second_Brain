@@ -1,6 +1,6 @@
 import { embeddingModel } from "@/lib/ai/geminiUtils";
 import { NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma/prisma";
+import { db } from "@/lib/prisma/prisma";
 
 
 export async function GET( req : NextRequest ,{params} : { params : { collectionID : string } }){
@@ -17,31 +17,41 @@ export async function GET( req : NextRequest ,{params} : { params : { collection
         if(!query || !userID || !collectionID){
             return new Response(JSON.stringify({
                 message: "Missing Params",
-                data : {query , userID , collectionID}   // For debug purposes 
+                data : {query , userID , collectionID}   
             }) , {status : 400})
         }
 
         const validQuery = query?.replace("+" , " ")
 
-
         const queryEmbedding = await embeddingModel.embedContent(validQuery)
         const embeddingValues = queryEmbedding.embedding.values;
 
-        const searchResults = await prisma.$queryRaw`
-          SELECT 
-            "id", 
-            "title", 
-            "summary", 
-            "contentType",
-            "mainContent",
-            1 - ("embedding" <-> ${embeddingValues}::vector) as similarity
-          FROM "Contents"
-          WHERE 
-            "collectionId" = ${collectionID} AND
-            "clerkId" = ${userID}
-          ORDER BY similarity DESC
-          LIMIT 5
-        `;
+        const searchResults = db.query(db.raw.sql`
+            WITH query_vector AS (
+                SELECT ${`[${embeddingValues.join(",")}]`}::vector AS value
+            )
+            SELECT
+                c."id",
+                c."title",
+                c."summary",
+                c."contentType",
+                c."mainContent",
+                (1 - (c."embedding" <=> q.value))::text AS "similarity"
+            FROM "Contents" AS c
+            CROSS JOIN query_vector AS q
+            WHERE
+                c."collectionId" = ${collectionID}
+                AND c."clerkId" = ${userID}
+            ORDER BY c."embedding" <=> q.value ASC
+            LIMIT 5
+            `.returnsRow({
+            id: db.sql.public.Contents.columns.id,
+            title: db.sql.public.Contents.columns.title,
+            summary: db.sql.public.Contents.columns.summary,
+            contentType: db.sql.public.Contents.columns.contentType,
+            mainContent: db.sql.public.Contents.columns.mainContent,
+            similarity: db.sql.public.Contents.columns.title,
+        }).build())
         
         return new Response(JSON.stringify({
         message: "Search completed successfully",
