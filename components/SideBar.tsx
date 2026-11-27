@@ -25,7 +25,7 @@ export default function SideBar( {userId , username , imageUrl , type } : {userI
         <div className={`${manrope.style} flex flex-col justify-start gap-6 py-7 px-4 md:px-2 lg:px-10 h-screen w-[280px] md:w-[300px] lg:w-[316px] bg-[#171717] border-r border-[#292929] fixed lg:static left-0 transform -translate-x-full lg:translate-x-0 transition-transform z-20`}>
             <div className="flex justify-between w-full items-center">
                 <div className="flex gap-2">
-                    { userId ? <Image src={`${imageUrl}`} alt="" className="size-8 rounded-full" /> : ""}
+                    { userId ? <Image src={`${imageUrl}`} alt="" width={32} height={32} className="size-8 rounded-full" /> : ""}
                     <h1 className="text-2xl">
                         {username.toUpperCase()}
                     </h1>

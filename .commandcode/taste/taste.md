@@ -1,0 +1,1 @@
+- User does not want the assistant to push code to git; changes should stay in the working directory unless explicitly asked. Confidence: 0.95
