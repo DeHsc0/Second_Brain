@@ -15,7 +15,7 @@ export function Alert (){
     const data = useContext(DataContext)
 
     return(
-        <div className={`${data && data.alert.length !== 0 ? "" : "hidden"} fixed pr-2 z-50 top-[77px] right-0`}>
+        <div className={`${data && data.alert.length !== 0 ? "" : "hidden"} fixed pr-2 z-[60] top-[77px] right-0`}>
             <AnimatePresence>
                 <motion.div 
                     initial={{ x: 300, opacity: 0 }}

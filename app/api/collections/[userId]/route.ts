@@ -5,7 +5,6 @@ import { auth } from "@clerk/nextjs/server"
 import { db } from "@/lib/prisma/prisma";
 import { CreationSchema, DeleteDataSchema} from "@/lib/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { collectMeta } from "next/dist/build/utils";
 
 export async function GET(req : NextRequest){
     

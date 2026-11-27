@@ -38,8 +38,11 @@ export default function CreationModel ({userId , closeModal , addCreatedData , t
             addCreatedData(response)
             return response
     }
-        catch{
-            alert?.addAlert("Something Went Wrong")
+        catch(error){
+            const message = axios.isAxiosError(error) && typeof error.response?.data?.message === "string"
+                ? error.response.data.message
+                : "Unable to create content. Please try again."
+            alert?.addAlert(message)
         }
     }    
 
@@ -149,10 +152,12 @@ export default function CreationModel ({userId , closeModal , addCreatedData , t
                 Cancel
             </button>
             <button 
-            onClick={() => {
-                handleSubmit()    
-                setContentType( () => [])  
-                closeModal()                  
+            onClick={async () => {
+                const response = await handleSubmit()
+                if (response) {
+                    setContentType(() => [])
+                    closeModal()
+                }
             }}
             className="border p-3 rounded-lg text-lg font-bold font-mono border-emerald-500 text-emerald-500 hover:bg-emerald-500/10">
                 Submit

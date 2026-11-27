@@ -26,7 +26,17 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
             }) , {status : 400})  
         }       
         
-        const additionalContent : string | null = await extractAdditionalContent(validData.data.contentType , validData.data.mainContent)
+        let additionalContent: string | null;
+        try {
+            additionalContent = await extractAdditionalContent(validData.data.contentType, validData.data.mainContent)
+        } catch (error) {
+            console.error("Failed to retrieve additional content:", error)
+            const message = validData.data.contentType.includes("YOUTUBE")
+                ? "Unable to retrieve a transcript for this YouTube video. Check that the video is accessible and has captions."
+                : "Unable to fetch this webpage. Check the URL and try again."
+
+            return new Response(JSON.stringify({ message }), { status: 502 })
+        }
         
         const prompt = `You are an expert content summarizer that creates concise 100-word summaries. Follow these rules:
 
@@ -101,9 +111,9 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
         }) , {status : 200})
     }
     catch(e){
+        console.error("Failed to create content:", e)
         return new Response(JSON.stringify({
-            message : "Something went wrong",
-            data : e
+            message : "Unable to create content. Please try again."
         }) , {status : 500})
     }
 }
@@ -130,21 +140,6 @@ export async function GET(req: NextRequest , params : ExclusiveParams) {
 
         }).select("id" , "title" , "summary" , "description" , "mainContent" , "contentType").all()
 
-        // const data = await prisma.contents.findMany({
-        //     where : {
-        //         clerkId : userID,
-        //         collectionId : collectionID 
-        //     },
-        //     select : {
-        //         id : true,
-        //         title : true,
-        //         summary : true,
-        //         description : true,
-        //         mainContent : true,
-        //         contentType : true            
-        //     }
-        // });
-        
         return new Response(JSON.stringify({
         message: "Success",
         data: data
@@ -192,15 +187,6 @@ export async function GET(req: NextRequest , params : ExclusiveParams) {
             
         }).update(updateData)
 
-        // const response = await prisma.contents.update({
-        //     where : {
-        //         id : validData.data.id,
-        //         clerkId : userID,
-        //         collectionId : collectionID
-        //     },
-        //     data : updateData
-        // }) 
-
         return new Response(JSON.stringify({
             message : "Content updated",
             data : response
@@ -237,14 +223,6 @@ export async function DELETE( req : NextRequest ,  params : ExclusiveParams ){
         }
 
         const response = await db.orm.public.Contents.where((col) => col.id.in(validData.data.ids)).where({collectionId : collectionID , clerkId : userID }).deleteAndCount()
-
-        // const response = await prisma.contents.deleteMany({
-        //     where : {
-        //         id : { in : validData.data.ids},
-        //         collectionId : collectionID,
-        //         clerkId : userID
-        //     }
-        // })    
 
         return new Response(JSON.stringify({
             message : "Content deleted",

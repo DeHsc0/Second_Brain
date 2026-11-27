@@ -10,14 +10,17 @@ export function extractYouTubeVideoId(content: string): string | null {
 
 export async function getYouTubeTranscript(content: string): Promise<string | null> {
   const videoId = extractYouTubeVideoId(content);
-  if (!videoId) return null;
-
-  try {
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
-    return transcriptItems.map(item => item.text).join(' ');
-  } catch (error) {
-    return error as string
+  if (!videoId) {
+    throw new Error('Invalid YouTube URL.');
   }
+
+  const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+  const transcript = transcriptItems.map(item => item.text).join(' ').trim();
+  if (!transcript) {
+    throw new Error('No transcript is available for this YouTube video.');
+  }
+
+  return transcript;
 }
 
 function extractUrlFromString(input: string): string | null {
@@ -27,21 +30,24 @@ function extractUrlFromString(input: string): string | null {
 }
 
 export async function extractTextFromUrl(input : string): Promise<string> {
-    try {
-      const url = extractUrlFromString(input)
-      if(!url)return "Unable to get the Content from the url" 
-      const response = await axios.get(url);
-      const $ = cheerio.load(response.data);
-      
-      $('script, style, nav, footer, header, aside').remove();
-      
-      const mainContent = $('main, article, .content, #content, .article-body').text() || $('body').text();
-      
-      return mainContent.replace(/\s+/g, ' ').trim();
-    } catch (error) {
-      return error as string
-    }
+  const url = extractUrlFromString(input);
+  if (!url) {
+    throw new Error('Invalid webpage URL.');
   }
+
+  const response = await axios.get(url);
+  const $ = cheerio.load(response.data);
+
+  $('script, style, nav, footer, header, aside').remove();
+
+  const mainContent = $('main, article, .content, #content, .article-body').text() || $('body').text();
+  const text = mainContent.replace(/\s+/g, ' ').trim();
+  if (!text) {
+    throw new Error('No readable text was found on this webpage.');
+  }
+
+  return text;
+}
 
   export async function extractAdditionalContent(
     contentType: ("WEBPAGE" | "YOUTUBE" | "CODE" | "NOTE")[],
