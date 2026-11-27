@@ -9,7 +9,7 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
 
     try{
 
-        const { collectionID } = await params.data
+        const { collectionID } = await params.params
 
         const { searchParams } = new URL(req.url)
 
@@ -111,7 +111,7 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
 export async function GET(req: NextRequest , params : ExclusiveParams) {
     
     try{
-        const { collectionID } = await params.data
+        const { collectionID } = await params.params
 
         const { searchParams } = new URL(req.url)
 
@@ -162,7 +162,7 @@ export async function GET(req: NextRequest , params : ExclusiveParams) {
 
     try{
 
-        const { collectionID } = await params.data
+        const { collectionID } = await params.params
 
         const { searchParams } = new URL(req.url)
 
@@ -218,7 +218,7 @@ export async function DELETE( req : NextRequest ,  params : ExclusiveParams ){
 
     try{
 
-        const { collectionID } = await params.data
+        const { collectionID } = await params.params
 
         const { searchParams } = new URL(req.url)
 

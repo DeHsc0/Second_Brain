@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/prisma/prisma";
 
 
-export async function GET( req : NextRequest ,{params} : { params : { collectionID : string } }){
+export async function GET( req : NextRequest ,{params} : { params : Promise<{ collectionID : string }> }){
 
     try {
         const {collectionID} = await params

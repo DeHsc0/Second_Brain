@@ -1,7 +1,15 @@
 import { DataContext } from "@/providers/dashboardProvider"
-import { ContentType } from "@prisma/client"
 import axios, { AxiosResponse } from "axios"
 import { useContext, useState } from "react"
+
+enum ContentType {
+
+    WEBPAGE = "WEBPAGE", 
+    YOUTUBE = "YOUTUBE", 
+    CODE = "CODE", 
+    NOTE = "NOTE"
+
+}
 
 export default function CreationModel ({userId , closeModal , addCreatedData , type , collectionID} : {userId : string , closeModal : () => void , addCreatedData : (response : AxiosResponse) => void , type : "collection" | "content" , collectionID : string}) {
 
@@ -73,50 +81,50 @@ export default function CreationModel ({userId , closeModal , addCreatedData , t
             className="gap-2 gap-y-3 overflow-clip flex flex-wrap">
                 <button 
                     onClick={(e) => {
-                        if(contentType.length !== 0 && contentType.includes("WEBPAGE")){
+                        if(contentType.length !== 0 && contentType.includes(ContentType.WEBPAGE)){
                             setContentType( () => contentType.filter(contentType => contentType !== "WEBPAGE"))
                         } else{
-                            setContentType( () => [...contentType , "WEBPAGE" ])
+                            setContentType( () => [...contentType , ContentType.WEBPAGE ])
                         }
                         e.preventDefault()
                     }}
-                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-emerald-400 text-emerald-400    ${contentType.includes("WEBPAGE") ? "bg-emerald-400/20" : ""} drop-shadow-lg`}> 
+                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-emerald-400 text-emerald-400    ${contentType.includes(ContentType.WEBPAGE) ? "bg-emerald-400/20" : ""} drop-shadow-lg`}> 
                         WEBPAGE
                 </button>
                 <button 
                     onClick={(e) => {
-                        if(contentType.includes("YOUTUBE")){
-                            setContentType( () => contentType.filter(contentType => contentType !== "YOUTUBE"))
+                        if(contentType.includes(ContentType.YOUTUBE)){
+                            setContentType( () => contentType.filter(contentType => contentType !== ContentType.YOUTUBE))
                         } else{
-                            setContentType( () => [...contentType , "YOUTUBE" ])
+                            setContentType( () => [...contentType , ContentType.YOUTUBE ])
                         }
                         e.preventDefault()
                     }}
-                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-red-400 text-red-400 ${contentType.includes("YOUTUBE") ? "bg-red-400/20" : ""} drop-shadow-lg`}> 
+                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-red-400 text-red-400 ${contentType.includes(ContentType.YOUTUBE) ? "bg-red-400/20" : ""} drop-shadow-lg`}> 
                         YOUTUBE
                 </button>
                 <button 
                     onClick={(e) => {
-                        if(contentType.includes("NOTE")){
-                            setContentType( () => contentType.filter(contentType => contentType !== "NOTE"))
+                        if(contentType.includes(ContentType.NOTE)){
+                            setContentType( () => contentType.filter(contentType => contentType !== ContentType.NOTE))
                         } else{
-                            setContentType( () => [...contentType , "NOTE" ])
+                            setContentType( () => [...contentType , ContentType.NOTE ])
                         }
                         e.preventDefault()
                     }}
-                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-purple-400 text-purple-400 ${contentType.includes("NOTE") ? "bg-purple-400/20" : ""} drop-shadow-lg`}> 
+                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-purple-400 text-purple-400 ${contentType.includes(ContentType.NOTE) ? "bg-purple-400/20" : ""} drop-shadow-lg`}> 
                         NOTE
                 </button>
                 <button 
                     onClick={(e) => {
-                        if(contentType.includes("CODE")){
-                            setContentType( () => contentType.filter(contentType => contentType !== "CODE"))
+                        if(contentType.includes(ContentType.CODE)){
+                            setContentType( () => contentType.filter(contentType => contentType !== ContentType.CODE))
                         } else{
-                            setContentType( () => [...contentType , "CODE" ])
+                            setContentType( () => [...contentType , ContentType.CODE ])
                         }
                         e.preventDefault()
                     }}
-                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-blue-400 text-blue-400 ${contentType.includes("CODE") ? "bg-blue-400/20" : ""} hover:bg-blue-400/20 drop-shadow-lg`}> 
+                    className={`border w-fit px-3 py-1.5 rounded-full font-mono border-blue-400 text-blue-400 ${contentType.includes(ContentType.CODE) ? "bg-blue-400/20" : ""} hover:bg-blue-400/20 drop-shadow-lg`}> 
                         CODE
                 </button>
             </div>

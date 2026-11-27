@@ -1,5 +1,4 @@
 
-import { ContentType } from "@prisma/client"
 import z from "zod"
 
 export const CreationSchema = z.object({
@@ -45,7 +44,7 @@ export interface RecCollectionData {
     title : string
     description ?: string
     contents : []
-    contentType : ContentType[]
+    contentType : "WEBPAGE" | "YOUTUBE"| "CODE"| "NOTE",
     mainContent ?: string
     summary ?: string
     similarity ?: number
@@ -53,5 +52,5 @@ export interface RecCollectionData {
 }
 
 export interface ExclusiveParams {
-    data : Promise<{collectionID : string}>
+    params : Promise<{collectionID : string}>
 }

@@ -6,7 +6,7 @@ import { RedirectToSignUp, useAuth , useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 
-export default function (){
+export default function Dashboard(){
 
     const { isLoaded: authLoaded, userId  } = useAuth();
     const { isLoaded: userLoaded, user } = useUser();

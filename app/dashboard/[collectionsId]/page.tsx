@@ -2,9 +2,9 @@ import ContentDashboard from "@/components/ContentDashboard"
 import SideBar from "@/components/SideBar"
 import { auth, currentUser } from "@clerk/nextjs/server"
 
-export default async function ContentsPage({params} : {params : { collectionsId : string}}) {
+export default async function ContentsPage({params} : {params : Promise<{ collectionsId : string }>}) {
 
-    const { collectionsId } = params;
+    const { collectionsId } = await params;
     
    
     const [authData, user] = await Promise.all([
