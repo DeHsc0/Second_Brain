@@ -1,4 +1,4 @@
-import { embeddingModel, model } from "@/lib/ai/geminiUtils";
+import { genAI } from "@/lib/ai/geminiUtils";
 import { db } from "@/lib/prisma/prisma";
 import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema , ExclusiveParams} from "@/lib/types/types";
 import { extractAdditionalContent} from "@/lib/Utils/utils";
@@ -61,17 +61,24 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
         ${additionalContent ? `Additional Content: ${additionalContent}` : null}
         ContentType: ${validData.data.contentType}`
             
-        const insertData = async ( model : GenerativeModel , embeddingModel : GenerativeModel  , prompt : string) : Promise<unknown> => {      
+        const insertData = async ( prompt : string) : Promise<unknown> => {      
             
-            const result = await model.generateContent(prompt);
-                        
-            const summary = await result.response.text();
+            const result = await genAI.models.generateContent({
+                model: 'gemini-3.8-flash',
+                contents: prompt
+            });
+            
+            const summary = result.text;
 
-            const embedding = await embeddingModel.embedContent(summary)
+            if (!summary ) return new Response(JSON.stringify({ message : "Unable to Respond at this point of time try again later" , success : false }))
+            
+            const embedding = await genAI.models.embedContent({contents : summary , model : "gemini-embedding-2" , config : { outputDimensionality : 1536}})
+
+            if (!embedding || !embedding.embeddings || !embedding.embeddings[0].values) return new Response(JSON.stringify({ message : "Unable to Respond at this point of time try again later" , success : false }))
             
             const id = crypto.randomUUID()
         
-            const validResult = await result.response.text().replace(/```(json)?\n|```/g, "").trim()         
+            const validResult = summary.replace(/```(json)?\n|```/g, "").trim()         
         
             const parsedJson : aiResponse = JSON.parse(validResult) 
         
@@ -89,7 +96,7 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
                 ${id}, ${validData.data.title}, ${validData.data.description || ""}, 
                 ${userID}, ${validData.data.mainContent || ""}, ${parsedJson.summary}, 
                 ${contentTypeArray}::"ContentType"[], ${collectionID}, 
-                [${embedding.embedding.values.join(",")}]::vector, NOW(), NOW()
+                [${embedding.embeddings[0].values.join(",")}]::vector, NOW(), NOW()
             
             )`.returnsRow({ 
             
@@ -104,7 +111,7 @@ export async function POST(req : NextRequest , params : ExclusiveParams){
             return res
         };
         
-        const data = await insertData(model , embeddingModel , prompt)
+        const data = await insertData(prompt)
         return new Response(JSON.stringify({
             message : "Content Created Successfully",
             data

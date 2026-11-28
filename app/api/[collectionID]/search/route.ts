@@ -1,4 +1,4 @@
-import { embeddingModel } from "@/lib/ai/geminiUtils";
+import { genAI } from "@/lib/ai/geminiUtils";
 import { NextRequest } from "next/server";
 import { db } from "@/lib/prisma/prisma";
 
@@ -23,12 +23,13 @@ export async function GET( req : NextRequest ,{params} : { params : Promise<{ co
 
         const validQuery = query?.replace("+" , " ")
 
-        const queryEmbedding = await embeddingModel.embedContent(validQuery)
-        const embeddingValues = queryEmbedding.embedding.values;
+        const queryEmbedding = await genAI.models.embedContent({ contents : validQuery , model : "gemini-embedding-2" , config : { outputDimensionality : 1536}})
+
+        if(!queryEmbedding || !queryEmbedding.embeddings || !queryEmbedding.embeddings[0].values) return new Response(JSON.stringify({ message : "Unable to process the requst at this time"}))
 
         const searchResults = db.query(db.raw.sql`
             WITH query_vector AS (
-                SELECT ${`[${embeddingValues.join(",")}]`}::vector AS value
+                SELECT ${`[${queryEmbedding.embeddings[0].values.join(",")}]`}::vector AS value
             )
             SELECT
                 c."id",

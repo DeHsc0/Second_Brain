@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai"
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "12345");  
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-const embeddingModel = genAI.getGenerativeModel({ model: "embedding-001"});
+const genAI = new GoogleGenAI({ apiKey : process.env.GEMINI_API_KEY || "12345"});  
 
-export { model , embeddingModel}
+genAI.models.embedContent
+
+export { genAI }
