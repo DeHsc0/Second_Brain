@@ -60,7 +60,7 @@ export async function GET( req : NextRequest ,{params} : { params : Promise<{ co
     } 
     catch(e){
         return new Response(JSON.stringify({
-            message : "Something went wrong",
+            message : "Unable to search through contents",
             data : e
         }) , {status : 500})
     }
