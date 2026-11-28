@@ -2,7 +2,6 @@ import { genAI } from "@/lib/ai/geminiUtils";
 import { db } from "@/lib/prisma/prisma";
 import { aiResponse, CreationSchema , UpdateContentSchema , DeleteDataSchema , ExclusiveParams} from "@/lib/types/types";
 import { extractAdditionalContent} from "@/lib/Utils/utils";
-import { GenerativeModel } from "@google/generative-ai";
 import { NextRequest } from "next/server";
 
 export async function POST(req : NextRequest , params : ExclusiveParams){

@@ -2,7 +2,7 @@ name: Build, Push to Docker Hub and Deploy Second_brain
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 concurrency:
@@ -59,8 +59,8 @@ jobs:
           script: |
             set -e
             cd ${{ secrets.VM_APP_DIR }}
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin master
+            git reset --hard origin/master
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f
