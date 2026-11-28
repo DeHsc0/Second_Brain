@@ -2,6 +2,6 @@ services:
   app:
     image: harshalso9/second_brain:latest
     env_file:
-      - .env.production
+      - .env.local
     ports:
       - "127.0.0.1:3002:3000"
