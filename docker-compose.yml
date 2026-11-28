@@ -1,6 +1,6 @@
 services:
   app:
-    image: harshalso9/secondbrain:latest
+    image: harshalso9/second_brain:latest
     env_file:
       - .env.production
     ports:
